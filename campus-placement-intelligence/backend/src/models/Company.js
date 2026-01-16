@@ -7,12 +7,8 @@ const companySchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    role: {
+    sector: {
       type: String,
-      required: true
-    },
-    minCGPA: {
-      type: Number,
       required: true
     }
   },

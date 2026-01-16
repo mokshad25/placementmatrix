@@ -1,23 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const { analyticsRateLimiter } = require("../middlewares/rateLimit.middleware");
-
 const {
-  cgpaVsSelection,
-  skillsImpact,
-  companyTrends
+  getCgpaVsSelection,
+  getSkillsImpact,
+  getCompanyTrends
 } = require("../controllers/analytics.controller");
 
-// Apply rate limiting ONLY to analytics
-router.use(analyticsRateLimiter);
-
-router.get("/cgpa-vs-selection", cgpaVsSelection);
-router.get("/skills-impact", skillsImpact);
-router.get("/company-trends", companyTrends);
+router.get("/cgpa-vs-selection", getCgpaVsSelection);
+router.get("/skills-impact", getSkillsImpact);
+router.get("/company-trends", getCompanyTrends);
 
 module.exports = router;
-
 
 
 

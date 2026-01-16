@@ -2,29 +2,54 @@ const mongoose = require("mongoose");
 
 const applicationSchema = new mongoose.Schema(
   {
-    student: {
+    studentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",
       required: true
     },
-    company: {
+
+    companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
       required: true
     },
-    roundsAttempted: {
+
+    roleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+      required: true
+    },
+
+    cgpaAtApplication: {
       type: Number,
       required: true,
-      min: 1
+      min: 0,
+      max: 10
     },
-    roundsCleared: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    finalOutcome: {
+
+    cgpaBucketAtApplication: {
       type: String,
-      enum: ["SELECTED", "REJECTED"],
+      required: true
+    },
+
+    skillsAtApplication: {
+      type: [String],
+      required: true
+    },
+
+    roundsReached: {
+      type: [String],
+      default: []
+    },
+
+    eliminatedRound: {
+      type: String,
+      default: null
+    },
+
+    outcome: {
+      type: String,
+      enum: ["selected", "rejected"],
       required: true
     }
   },
