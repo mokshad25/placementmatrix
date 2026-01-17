@@ -17,7 +17,7 @@ const applicationSchema = new mongoose.Schema(
     roleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
-      required: true
+      required: false
     },
 
     cgpaAtApplication: {
