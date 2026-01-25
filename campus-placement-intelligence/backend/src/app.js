@@ -18,11 +18,25 @@ const app = express();
 // ✅ CORS (frontend → backend)
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // local frontend
-      "https://frontend-virid-alpha-47.vercel.app" // production frontend (replace later)
-    ],
-    credentials: true
+    origin: function (origin, callback) {
+      // Allow server-to-server / Postman / curl
+      if (!origin) return callback(null, true);
+
+      // Allow localhost
+      if (origin.startsWith("http://localhost")) {
+        return callback(null, true);
+      }
+
+      // Allow ALL Vercel frontends
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS not allowed"), false);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
