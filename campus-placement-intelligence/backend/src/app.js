@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // local frontend
-      "https://your-frontend-url.vercel.app" // production frontend (replace later)
+      "https://frontend-virid-alpha-47.vercel.app" // production frontend (replace later)
     ],
     credentials: true
   })

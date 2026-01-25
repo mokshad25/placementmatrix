@@ -1,14 +1,15 @@
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 /* ======================
-   SIGNUP
+   SIGNUP CONTROLLER
 ====================== */
-exports.signup = async (req, res, next) => {
+const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    // Basic validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -16,6 +17,7 @@ exports.signup = async (req, res, next) => {
       });
     }
 
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
@@ -24,8 +26,10 @@ exports.signup = async (req, res, next) => {
       });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create user
     await User.create({
       name,
       email,
@@ -37,40 +41,57 @@ exports.signup = async (req, res, next) => {
       message: "User registered successfully"
     });
   } catch (err) {
-    next(err);
+    console.error("SIGNUP ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 };
 
-
 /* ======================
-   LOGIN
+   LOGIN CONTROLLER
 ====================== */
-exports.login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1️⃣ Check user
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required"
+      });
+    }
+
+    // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials"
+      });
     }
 
-    // 2️⃣ Compare password
+    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials"
+      });
     }
 
-    // 3️⃣ Generate token
+    // Generate JWT
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // 4️⃣ Send response
-    res.status(200).json({
-      message: "Login successful",
+    return res.status(200).json({
+      success: true,
       token,
       user: {
         id: user._id,
@@ -79,23 +100,42 @@ exports.login = async (req, res, next) => {
       }
     });
   } catch (err) {
-    next(err);
+    console.error("LOGIN ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 };
-exports.getMe = async (req, res) => {
+
+/* ======================
+   GET CURRENT USER
+====================== */
+const getMe = async (req, res) => {
   try {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       user: {
         id: req.user.userId
       }
     });
   } catch (err) {
-    res.status(500).json({
+    console.error("GET ME ERROR:", err);
+
+    return res.status(500).json({
       success: false,
-      message: "Failed to fetch user"
+      message: "Internal server error"
     });
   }
 };
 
+/* ======================
+   EXPORTS (IMPORTANT)
+====================== */
+module.exports = {
+  signup,
+  login,
+  getMe
+};
 
